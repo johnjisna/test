@@ -1,0 +1,25 @@
+name: docker-django-example #Project-Name
+services:
+  web:
+    image: ${IMAGE_NAME}:${WEB_TAG}
+    container_name: ${APP_NAME}-app
+    command: uwsgi --ini uwsgi.ini
+    restart: always    
+    env_file:
+      - ./.env
+    networks:
+      - app-network  
+  nginx:
+    image: ${IMAGE_NAME}:${NGINX_TAG}
+    container_name: ${APP_NAME}-nginx
+    restart: always
+    ports:
+    - 80:80
+    - 443:443
+    depends_on:
+    - web
+    networks:
+      - app-network      
+networks:
+  app-network:
+    name: ${APP_NAME}       

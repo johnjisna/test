@@ -9,10 +9,13 @@ pipeline {
         FILE_NAME = 'samplefile'
         LOCAL_BUILD_DIR = '.'
         IMAGE_NAME = 'sample-app-image:latest'
+<<<<<<< HEAD
         DEV_DIR = "/var/lib/jenkins/workspace/dev"
         DEV_TAG = "dev"
         PROD_DIR = "/var/lib/jenkins/workspace/prod"
         PROD_TAG = "prod"
+=======
+>>>>>>> origin/develop
     }
 
     stages {
@@ -23,7 +26,12 @@ pipeline {
             environment {
                 SERVER_NAME = "develop-server"
                 APP_NAME = "develop-app"
+<<<<<<< HEAD
                 
+=======
+                DEV_DIR = "${JENKINS_HOME}/workspace/dev"
+                DEV_TAG = "dev"
+>>>>>>> origin/develop
             }
             steps {
                 script {
@@ -44,7 +52,12 @@ pipeline {
             environment {
                 SERVER_NAME = "production-server"
                 APP_NAME = "production-app"
+<<<<<<< HEAD
                 
+=======
+                PROD_DIR = "${JENKINS_HOME}/workspace/prod"
+                PROD_TAG = "prod"
+>>>>>>> origin/develop
             }
             steps {
                 script {

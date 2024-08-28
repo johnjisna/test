@@ -25,8 +25,8 @@ pipeline {
                     checkout scm
                     def fileContent = readFile(env.FILE_NAME)
                     echo "File content from develop branch:\n${fileContent}"
-                    echo "$SERVER_NAME"
-                    echo "$APP_NAME"
+                    echo "SERVER_NAME: ${env.SERVER_NAME}"
+                    echo "APP_NAME: ${env.APP_NAME}"
                 }
             }
         }
@@ -45,8 +45,8 @@ pipeline {
                     checkout scm
                     def fileContent = readFile(env.FILE_NAME)
                     echo "File content from production branch:\n${fileContent}"
-                    echo "$SERVER_NAME"
-                    echo "$APP_NAME"
+                    echo "SERVER_NAME: ${env.SERVER_NAME}"
+                    echo "APP_NAME: ${env.APP_NAME}"
                 }
             }
         }

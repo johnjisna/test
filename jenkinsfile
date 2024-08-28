@@ -6,8 +6,9 @@ pipeline {
     }
 
     environment {
-        
         FILE_NAME = 'samplefile'
+        LOCAL_BUILD_DIR = '.'
+        IMAGE_NAME = 'sample-app-image:latest'
     }
 
     stages {
@@ -18,6 +19,8 @@ pipeline {
             environment {
                 SERVER_NAME = "develop-server"
                 APP_NAME = "develop-app"
+                DEV_DIR = "/var/lib/jenkins/workspace/dev"
+                DEV_TAG = "dev"
             }
             steps {
                 script {
@@ -38,6 +41,8 @@ pipeline {
             environment {
                 SERVER_NAME = "production-server"
                 APP_NAME = "production-app"
+                PROD_DIR = "/var/lib/jenkins/workspace/prod"
+                PROD_TAG = "prod"
             }
             steps {
                 script {
@@ -47,6 +52,43 @@ pipeline {
                     echo "File content from production branch:\n${fileContent}"
                     echo "SERVER_NAME: ${env.SERVER_NAME}"
                     echo "APP_NAME: ${env.APP_NAME}"
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image from ${env.LOCAL_BUILD_DIR}"
+                script {
+                    dir(env.LOCAL_BUILD_DIR) {
+                        sh "docker build -t ${env.IMAGE_NAME} ."
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image to Dev') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                echo "Pushing Docker image to development repository"
+                script {
+                    sh "docker tag ${env.IMAGE_NAME} ${env.DEV_DIR}/${env.IMAGE_NAME}:${env.DEV_TAG}"
+                    sh "docker push ${env.DEV_DIR}/${env.IMAGE_NAME}:${env.DEV_TAG}"
+                }
+            }
+        }
+
+        stage('Push Docker Image to Prod') {
+            when {
+                branch 'production'
+            }
+            steps {
+                echo "Pushing Docker image to production repository"
+                script {
+                    sh "docker tag ${env.IMAGE_NAME} ${env.PROD_DIR}/${env.IMAGE_NAME}:${env.PROD_TAG}"
+                    sh "docker push ${env.PROD_DIR}/${env.IMAGE_NAME}:${env.PROD_TAG}"
                 }
             }
         }

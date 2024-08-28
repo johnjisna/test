@@ -15,12 +15,18 @@ pipeline {
             when {
                 branch 'develop'
             }
+            environment {
+                SERVER_NAME = "develop-server"
+                APP_NAME = "develop-app"
+            }
             steps {
                 script {
                     echo "Running on develop branch"
                     checkout scm
                     def fileContent = readFile(env.FILE_NAME)
                     echo "File content from develop branch:\n${fileContent}"
+                    echo "SERVER_NAME: ${env.SERVER_NAME}"
+                    echo "APP_NAME: ${env.APP_NAME}"
                 }
             }
         }
@@ -29,12 +35,18 @@ pipeline {
             when {
                 branch 'production'
             }
+            environment {
+                SERVER_NAME = "production-server"
+                APP_NAME = "production-app"
+            }
             steps {
                 script {
                     echo "Running on production branch"
                     checkout scm
                     def fileContent = readFile(env.FILE_NAME)
                     echo "File content from production branch:\n${fileContent}"
+                    echo "SERVER_NAME: ${env.SERVER_NAME}"
+                    echo "APP_NAME: ${env.APP_NAME}"
                 }
             }
         }

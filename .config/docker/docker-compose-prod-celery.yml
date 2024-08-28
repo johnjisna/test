@@ -1,0 +1,16 @@
+name: docker-django-example #Project-Name
+
+services:
+  web:
+    image: ${IMAGE_NAME}:${WEB_TAG}
+    container_name: ${APP_NAME}-celery
+    command: celery -A celery-app worker -l info --concurrency=1
+    restart: always    
+    env_file:
+      - ./.env
+    networks:
+      - ${APP_NAME}  
+
+networks:
+  app-network:
+    name: ${APP_NAME}    

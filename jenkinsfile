@@ -94,11 +94,20 @@ pipeline {
             when {
                 branch 'production'
             }
+            environment {
+                IMAGE_NAME = "sample-app-image"
+                WEB_TAG = "latest-prod"
+                APP_NAME = "test-app-prod"
+                WEB_PORT = "8001"
+                DB_PORT = "5432"
+                }
             steps {
-                echo "Pushing Docker image to production repository"
+                echo "Pushing Docker image to development repository"
                 script {
                     sh "docker tag sample-app-image:latest sample-app-image:latest-prod"
-               
+                    sh 'cd /var/lib/jenkins && ls -l'
+                    sh  " docker compose up -d "               
+
                 }
             }
         }

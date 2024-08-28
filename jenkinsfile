@@ -72,6 +72,13 @@ pipeline {
             when {
                 branch 'develop'
             }
+            environment {
+                IMAGE_NAME = "sample-app-image"
+                WEB_TAG = "latest-dev"
+                APP_NAME = "test-app-dev"
+                WEB_PORT = "8002"
+                DB_PORT = "5432"
+                }
             steps {
                 echo "Pushing Docker image to development repository"
                 script {

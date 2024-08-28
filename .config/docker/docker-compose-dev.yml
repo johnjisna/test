@@ -1,0 +1,86 @@
+name: docker-django-example #Project-Name
+services:
+  nginx:
+    image: ${IMAGE_NAME}:${NGINX_TAG}
+    container_name: ${APP_NAME}-nginx
+    restart: always
+    env_file:
+      - ./.env    
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - web
+    networks:
+      - app-network      
+
+  web:
+    image: ${IMAGE_NAME}:${WEB_TAG}
+    container_name: ${APP_NAME}-app
+    command: ["uwsgi", "--ini", "uwsgi.ini"]
+    restart: always
+    env_file:
+      - ./.env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy 
+    networks:
+      - app-network                
+  db:
+    image: postgres:16.2-alpine3.19
+    container_name: ${APP_NAME}-db   
+    restart: always 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.db
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3    
+    networks:
+      - app-network            
+  redis:
+    image: "redis:alpine"
+    restart: always
+    container_name: ${APP_NAME}-redis    
+    volumes: 
+      - cache:/data      
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5      
+    networks:
+      - app-network          
+
+  # celery:
+  #   image: ${IMAGE_NAME}:${WEB_TAG}
+  #   container_name: ${APP_NAME}-celery
+  #   command: celery -A celery-app worker -l info --concurrency=1
+  #   restart: always
+  #   env_file:
+  #     - ./.env
+  #   depends_on:
+  #     - db
+  #     - redis
+    # networks:
+    #   - app-network   
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw 
+    networks:
+      - app-network       
+      
+volumes:
+  postgres_data:
+  cache:
+networks:
+  app-network:
+    name: ${APP_NAME}

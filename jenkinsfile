@@ -8,7 +8,7 @@ pipeline {
     environment {
         FILE_NAME = 'samplefile'
         LOCAL_BUILD_DIR = '.'
-        IMAGE_NAME = 'sample-app-image:latest-dev'
+     //   IMAGE_NAME = 'sample-app-image:latest-dev'
         PROD_DIR = "/home/sayone/test-prod"
         PROD_TAG = "prod"
         DEV_DIR = "/home/sayone/test-dev"

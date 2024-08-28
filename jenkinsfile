@@ -6,8 +6,13 @@ pipeline {
     }
 
     environment {
-        
         FILE_NAME = 'samplefile'
+        LOCAL_BUILD_DIR = '.'
+        IMAGE_NAME = 'sample-app-image:latest-dev'
+        PROD_DIR = "/home/sayone/test-prod"
+        PROD_TAG = "prod"
+        DEV_DIR = "/home/sayone/test-dev"
+        DEV_TAG = "dev"
     }
 
     stages {
@@ -15,12 +20,18 @@ pipeline {
             when {
                 branch 'develop'
             }
+            environment {
+                SERVER_NAME = "develop-server"
+                APP_NAME = "develop-app"
+            }
             steps {
                 script {
                     echo "Running on develop branch"
                     checkout scm
                     def fileContent = readFile(env.FILE_NAME)
                     echo "File content from develop branch:\n${fileContent}"
+                    echo "SERVER_NAME: ${env.SERVER_NAME}"
+                    echo "APP_NAME: ${env.APP_NAME}"
                 }
             }
         }
@@ -29,14 +40,78 @@ pipeline {
             when {
                 branch 'production'
             }
+            environment {
+                SERVER_NAME = "production-server"
+                APP_NAME = "production-app"
+                
+            }
             steps {
                 script {
                     echo "Running on production branch"
                     checkout scm
                     def fileContent = readFile(env.FILE_NAME)
                     echo "File content from production branch:\n${fileContent}"
+                    echo "SERVER_NAME: ${env.SERVER_NAME}"
+                    echo "APP_NAME: ${env.APP_NAME}"
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image from ${env.LOCAL_BUILD_DIR}"
+                script {
+                    dir(env.LOCAL_BUILD_DIR) {
+                        sh "docker build -t ${env.IMAGE_NAME} ."
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image to Dev') {
+            when {
+                branch 'develop'
+            }
+            environment {
+                IMAGE_NAME = "sample-app-image"
+                WEB_TAG = "latest-dev"
+                APP_NAME = "test-app-dev"
+                WEB_PORT = "8002"
+                DB_PORT = "5432"
+                }
+            steps {
+                echo "Pushing Docker image to development repository"
+                script {
+                    sh "docker tag sample-app-image:latest sample-app-image:latest-dev"
+                    sh 'cd /var/lib/jenkins && ls -l'
+                    sh  " docker compose up -d "               
+
+                }
+            }
+        }
+
+        stage('Push Docker Image to Prod') {
+            when {
+                branch 'production'
+            }
+            environment {
+                IMAGE_NAME = "sample-app-image"
+                WEB_TAG = "latest-prod"
+                APP_NAME = "test-app-prod"
+                WEB_PORT = "8001"
+                DB_PORT = "5432"
+                }
+            steps {
+                echo "Pushing Docker image to development repository"
+                script {
+                    sh "docker tag sample-app-image:latest sample-app-image:latest-prod"
+                    sh 'cd /var/lib/jenkins && ls -l'
+                    sh  " docker compose up -d "               
+
                 }
             }
         }
     }
 }
+
+

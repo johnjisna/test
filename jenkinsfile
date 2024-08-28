@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    options { 
+        buildDiscarder(logRotator(numToKeepStr: "3")) 
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        
+        FILE_NAME = 'samplefile'
+    }
+
+    stages {
+        stage('Read File from Develop') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                script {
+                    echo "Running on develop branch"
+                    checkout scm
+                    def fileContent = readFile(env.FILE_NAME)
+                    echo "File content from develop branch:\n${fileContent}"
+                }
+            }
+        }
+
+        stage('Read File from Production') {
+            when {
+                branch 'production'
+            }
+            steps {
+                script {
+                    echo "Running on production branch"
+                    checkout scm
+                    def fileContent = readFile(env.FILE_NAME)
+                    echo "File content from production branch:\n${fileContent}"
+                }
+            }
+        }
+    }
+}

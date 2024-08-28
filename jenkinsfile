@@ -76,7 +76,10 @@ pipeline {
                 echo "Pushing Docker image to development repository"
                 script {
                     sh "docker tag sample-app-image:latest sample-app-image:latest-dev"
-                    sh "docker push ${env.DEV_DIR}/${env.IMAGE_NAME}:${env.DEV_TAG}"
+                   // sh "docker push ${env.DEV_DIR}/${env.IMAGE_NAME}:${env.DEV_TAG}"
+                   sh "cp docker-compose.yml /var/lib/jenkins/workspace/dev"
+                   sh "cp .env /var/lib/jenkins/workspace/dev"
+
                 }
             }
         }
@@ -89,7 +92,7 @@ pipeline {
                 echo "Pushing Docker image to production repository"
                 script {
                     sh "docker tag sample-app-image:latest sample-app-image:latest-prod"
-                    sh "docker push ${env.PROD_DIR}/${env.IMAGE_NAME}:${env.PROD_TAG}"
+                  //  sh "docker push ${env.PROD_DIR}/${env.IMAGE_NAME}:${env.PROD_TAG}"
                 }
             }
         }

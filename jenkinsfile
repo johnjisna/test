@@ -8,10 +8,10 @@ pipeline {
     environment {
         FILE_NAME = 'samplefile'
         LOCAL_BUILD_DIR = '.'
-        IMAGE_NAME = 'sample-app-image:latest'
-        PROD_DIR = "/var/lib/jenkins/workspace/prod"
+        IMAGE_NAME = 'sample-app-image:latest-dev'
+        PROD_DIR = "/home/sayone/test-prod"
         PROD_TAG = "prod"
-        DEV_DIR = "/var/lib/jenkins/workspace/dev"
+        DEV_DIR = "/home/sayone/test-dev"
         DEV_TAG = "dev"
     }
 
@@ -76,7 +76,9 @@ pipeline {
                 echo "Pushing Docker image to development repository"
                 script {
                     sh "docker tag sample-app-image:latest sample-app-image:latest-dev"
-                    sh "docker push ${env.DEV_DIR}/${env.IMAGE_NAME}:${env.DEV_TAG}"
+                    sh  "cd /home/sayone/test-dev"
+                    sh  " docker compose up -d "               
+
                 }
             }
         }
@@ -89,7 +91,7 @@ pipeline {
                 echo "Pushing Docker image to production repository"
                 script {
                     sh "docker tag sample-app-image:latest sample-app-image:latest-prod"
-                    sh "docker push ${env.PROD_DIR}/${env.IMAGE_NAME}:${env.PROD_TAG}"
+               
                 }
             }
         }
